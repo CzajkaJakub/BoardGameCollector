@@ -1,9 +1,7 @@
 package com.example.boardgamecollector
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -14,6 +12,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import java.io.File
+import java.lang.Exception
 import java.util.concurrent.Executors
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -21,12 +20,12 @@ class MainActivity : AppCompatActivity() {
 
     private val mapper = jacksonObjectMapper()
     lateinit var user : UserSettings
+    private val reloadDataButton : FloatingActionButton = findViewById(R.id.reloadData)
 
-    @RequiresApi(Build.VERSION_CODES.N)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkUsersSettings()
-        val reloadDataButton : FloatingActionButton = findViewById(R.id.reloadDataButton)
 
         reloadDataButton.setOnClickListener {
             val executor  = Executors.newSingleThreadExecutor()
@@ -37,30 +36,32 @@ class MainActivity : AppCompatActivity() {
                 request.saveData(dataFile, data)
                 val xmlDoc: Document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(File(dataFile))
                 xmlDoc.documentElement.normalize()
+                val myDatabase = DatabaseHelper(this)
 
-                val gameList: NodeList = xmlDoc.getElementsByTagName("items")
+                val gameList: NodeList = xmlDoc.getElementsByTagName("item")
                 for(i in 0 until gameList.length){
-
-                    var game: Node = gameList.item(i)
+                    val game: Node = gameList.item(i)
 
                     if (game.nodeType === Node.ELEMENT_NODE) {
-
                         val elem = game as Element
+//                        val mMap = mutableMapOf<String, String>()
+//
+//                        for(j in 0 until elem.attributes.length)
+//                        {
+//                            mMap.putIfAbsent(elem.attributes.item(j).nodeName, elem.attributes.item(j).nodeValue)
+//                        }
+//                        println("Current Book : ${game.nodeName} - $mMap")
+
+                        myDatabase.addDataToSQL("gsfdfra", "gfszdfame", 11422332, 234203, "ifasage", 12322)
 
 
-                        val mMap = mutableMapOf<String, String>()
+                        try{
+                            println("name: ${elem.getElementsByTagName("name").item(0).textContent}")
+                            println("yearpublished: ${elem.getElementsByTagName("yearpublished").item(0).textContent}")
+                            println("image: ${elem.getElementsByTagName("image").item(0).textContent}")
+                            println("numplays: ${elem.getElementsByTagName("numplays").item(0).textContent}")
+                        } catch (e: Exception){}
 
-
-                        for(j in 0 until elem.attributes.length)
-                        {
-                            mMap.putIfAbsent(elem.attributes.item(j).nodeName, elem.attributes.item(j).nodeValue)
-                        }
-                        println("Current Book : ${game.nodeName} - $mMap")
-
-                        println("name: ${elem.getElementsByTagName("name").item(0).textContent}")
-                        println("yearpublished: ${elem.getElementsByTagName("yearpublished").item(0).textContent}")
-                        println("image: ${elem.getElementsByTagName("image").item(0).textContent}")
-                        println("numplays: ${elem.getElementsByTagName("numplays").item(0).textContent}")
 
                     }
                 }
@@ -68,11 +69,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-
-//        val myDatabase = DatabaseHelper(this)
-//            myDatabase.addDataToSQL("gsfdfra", "gfszdfame", 11422332, 234203, "ifasage", 12322)
-        }
+    }
 
 
 

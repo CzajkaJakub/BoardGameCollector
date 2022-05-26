@@ -14,7 +14,7 @@ class Settings : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        setButtonsListeners()
+        //setButtonsListeners()
     }
 
     private fun setButtonsListeners() {
@@ -23,7 +23,7 @@ class Settings : AppCompatActivity() {
             val userPath = this.filesDir.toString().plus("/user.json")
             val userSettingsFile = File(userPath)
             if(!userSettingsFile.exists()) userSettingsFile.createNewFile()
-            val user = UserSettings(usernameField.text.toString())
+            val user = UserSettings(usernameField.text.toString(), 0, 0, "Synchronize to get data!")
             mapper.writeValue(File(userPath), user)
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)

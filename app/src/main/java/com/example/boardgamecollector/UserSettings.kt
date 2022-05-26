@@ -7,5 +7,14 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class UserSettings(
 
     @JsonProperty("username")
-    var username: String
+    var username: String,
+
+    @JsonProperty("amountOfGame")
+    var amountOfGame: Int,
+
+    @JsonProperty("amountOfAdditions")
+    var amountOfAdditions: Int,
+
+    @JsonProperty("lastSynchronizedDate")
+    var lastSynchronizedDate: String
 )
