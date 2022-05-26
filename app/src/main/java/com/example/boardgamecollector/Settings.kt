@@ -14,7 +14,7 @@ class Settings : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        //setButtonsListeners()
+        setButtonsListeners()
     }
 
     private fun setButtonsListeners() {

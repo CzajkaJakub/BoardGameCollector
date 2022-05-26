@@ -10,20 +10,44 @@
         android:id="@+id/usernameView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.47"
+        android:layout_marginStart="194dp"
+        android:layout_marginTop="38dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.053" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/reloadData"
+    <TextView
+        android:id="@+id/amountOfGamesLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="43dp"
+        app:layout_constraintEnd_toStartOf="@+id/amountOfAdditionsLabel"
+        app:layout_constraintStart_toStartOf="@+id/amountOfAdditionsLabel"
+        app:layout_constraintTop_toBottomOf="@+id/usernameView" />
+
+    <TextView
+        android:id="@+id/amountOfAdditionsLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        app:layout_constraintStart_toStartOf="@+id/usernameView"
+        app:layout_constraintTop_toBottomOf="@+id/amountOfGamesLabel" />
+
+    <TextView
+        android:id="@+id/lastSynchronizedDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="41dp"
+        app:layout_constraintStart_toStartOf="@+id/amountOfAdditionsLabel"
+        app:layout_constraintTop_toBottomOf="@+id/amountOfAdditionsLabel" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/reloadDataButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="49dp"
+        android:layout_marginBottom="49dp"
         android:clickable="true"
+        android:contentDescription="@string/next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/load_data_icon" />
