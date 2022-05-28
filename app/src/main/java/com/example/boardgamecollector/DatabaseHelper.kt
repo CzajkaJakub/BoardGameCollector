@@ -34,7 +34,11 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
         contentValues.put(CURRENT_RANK_POSITION, game.currentRank)
         contentValues.put(IMAGE, game.image)
 
-        database.insert(TABLE_NAME, null, contentValues)
+        val id =  database.insertWithOnConflict(TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE).toInt()
+        if (id == -1) {
+            database.update(TABLE_NAME, contentValues, "_id=?", arrayOf(game.id))
+        }
+        database.close()
     }
 
     companion object {
