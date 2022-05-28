@@ -2,10 +2,10 @@ package com.example.boardgamecollector
 
 
 class GameInfo {
-    lateinit var id : String
-    lateinit var gameName : String
+    var id : String = ""
+    var gameName : String = ""
     var yearPublished : String = ""
-    lateinit var image : String
+    var image : String = ""
     var currentRank : String = "0"
 
     override fun toString(): String {

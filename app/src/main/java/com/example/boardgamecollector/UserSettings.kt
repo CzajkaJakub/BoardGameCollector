@@ -13,7 +13,7 @@ data class UserSettings(
     var amountOfGame: Int,
 
     @JsonProperty("amountOfAdditions")
-    var amountOfAdditions: Int,
+    var amountOfExtensions: Int,
 
     @JsonProperty("lastSynchronizedDate")
     var lastSynchronizedDate: String
