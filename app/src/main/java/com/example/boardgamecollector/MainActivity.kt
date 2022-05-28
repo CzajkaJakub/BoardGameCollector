@@ -21,7 +21,8 @@ class MainActivity : AppCompatActivity() {
 
     private val mapper = jacksonObjectMapper()
     private lateinit var user : UserSettings
-    private lateinit var dataFile : String
+    private lateinit var dataFileGames : String
+    private lateinit var dataFileExtensions : String
     private val request = Request()
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -76,23 +77,34 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun parseXmlCollectionFile() {
-        dataFile = "$filesDir/data.xml"
-        val requestData = request.readRequest("https://boardgamegeek.com/xmlapi2/collection?username=${user.username}&stats=1")
-        request.saveData(dataFile, requestData)
+        dataFileGames = "$filesDir/gamesData.xml"
+        dataFileExtensions = "$filesDir/extensionsData.xml"
+
+        val requestDataGame = request.readRequest("https://boardgamegeek.com/xmlapi2/collection?username=${user.username}&stats=1&subtype=boardgame")
+        val requestDataExtensions = request.readRequest("https://boardgamegeek.com/xmlapi2/collection?username=${user.username}&stats=1&subtype=boardgameexpansion")
+
+        request.saveData(dataFileGames, requestDataGame)
+        request.saveData(dataFileExtensions, requestDataExtensions)
+
         val pullParserFactory: XmlPullParserFactory
         val databaseAccess = DatabaseHelper(this)
         try{
             pullParserFactory = XmlPullParserFactory.newInstance()
             val parser = pullParserFactory.newPullParser()
-            val inputStream = applicationContext.openFileInput("data.xml")
+            val inputStreamGames = applicationContext.openFileInput("gamesData.xml")
+            val inputStreamExtensions = applicationContext.openFileInput("extensionsData.xml")
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
-            parser.setInput(inputStream, null)
-            val games = parseXml(parser)
 
-            for (game in games!!){
-                databaseAccess.addGameToDatabase(game)
-            }
+            parser.setInput(inputStreamGames, null)
+            val (listOfGames, amountOfGames) = parseXml(parser)
 
+            parser.setInput(inputStreamExtensions, null)
+            val (listOfExtensions, amountOfExtensions) = parseXml(parser)
+
+            listOfGames!!.stream().forEach { databaseAccess.addGameToDatabase(it) }
+            listOfExtensions!!.stream().forEach { it.extension = true; databaseAccess.addGameToDatabase(it) }
+
+            reloadRefreshDate(amountOfGames, amountOfExtensions)
 
         } catch (e: XmlPullParserException){
             println(e.printStackTrace())
@@ -103,12 +115,11 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Throws (XmlPullParserException::class, IOException::class)
-    private fun parseXml(parser: XmlPullParser): ArrayList<GameInfo>? {
+    private fun parseXml(parser: XmlPullParser): Pair<ArrayList<GameInfo>?, Int> {
         var games: ArrayList<GameInfo>? = null
         var eventType = parser.eventType
         var game: GameInfo? = null
-        var amountOfGames = 0
-        var amountOfExtensions = 0
+        var amountOfItems = 0
 
         while (eventType != XmlPullParser.END_DOCUMENT){
             var name: String
@@ -116,6 +127,10 @@ class MainActivity : AppCompatActivity() {
                 XmlPullParser.START_DOCUMENT -> games = ArrayList()
                 XmlPullParser.START_TAG -> {
                     name = parser.name
+                    if (name == "items") {
+                        amountOfItems = parser.getAttributeValue(null, "totalitems").toInt()
+                    }
+
                     if (name == "item"){
                         game = GameInfo()
                         game.id = parser.getAttributeValue(null, "objectid")
@@ -128,11 +143,6 @@ class MainActivity : AppCompatActivity() {
                             "rank" -> {
                                 if(parser.getAttributeValue(null, "name") == "boardgame"){
                                     game.currentRank = parser.getAttributeValue(null, "value")
-
-                                    when (game.currentRank) {
-                                        "Not Ranked" -> amountOfExtensions ++
-                                        else -> amountOfGames ++
-                                    }
                                 }
                             }
                         }
@@ -148,8 +158,7 @@ class MainActivity : AppCompatActivity() {
             }
             eventType = parser.next()
         }
-        reloadRefreshDate(amountOfGames, amountOfExtensions)
-        return games
+        return Pair(games, amountOfItems)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

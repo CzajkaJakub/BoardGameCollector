@@ -7,8 +7,11 @@ class GameInfo {
     var yearPublished : String = "No Data"
     var image : String = "No Data"
     var currentRank : String = "No Data"
+    var extension : Boolean = false
 
     override fun toString(): String {
-        return "GameInfo(id='$id', gameName='$gameName', yearPublished='$yearPublished', image='$image', currentRank='$currentRank')"
+        return "GameInfo(id='$id', gameName='$gameName', yearPublished='$yearPublished', image='$image', currentRank='$currentRank', extension=$extension)"
     }
+
+
 }
