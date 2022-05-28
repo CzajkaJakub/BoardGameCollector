@@ -1,13 +1,16 @@
 package com.example.boardgamecollector
 
 
-class GameInfo {
-    var id : String = ""
-    var gameName : String = "No Data"
-    var yearPublished : String = "No Data"
-    var image : String = "No Data"
-    var currentRank : String = "No Data"
-    var extension : Boolean = false
+class GameInfo(
+    var id: String,
+    var gameName: String,
+    var yearPublished: String,
+    var currentRank: String,
+    var extension: Boolean,
+    var image: String
+) {
+    constructor() : this("", "", "", "", false, "")
+
 
     override fun toString(): String {
         return "GameInfo(id='$id', gameName='$gameName', yearPublished='$yearPublished', image='$image', currentRank='$currentRank', extension=$extension)"

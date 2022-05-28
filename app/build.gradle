@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id "kotlin-android-extensions"
+
 }
 
 android {
@@ -40,9 +41,10 @@ dependencies {
     implementation 'android.arch.navigation:navigation-fragment-ktx:1.0.0'
     implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")
+    implementation("androidx.test:runner:1.5.0-alpha03")
+
 
 
 

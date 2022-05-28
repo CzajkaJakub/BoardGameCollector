@@ -2,8 +2,8 @@ package com.example.boardgamecollector
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 
 class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
     context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -44,6 +44,33 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
         database.close()
     }
 
+    fun getDataGamesExtensions(getGamesByNameAsc: QueriesTypes): ArrayList<GameInfo> {
+        val data = ArrayList<GameInfo>()
+        val database : SQLiteDatabase = this.readableDatabase
+        val query : String = when (getGamesByNameAsc){
+            QueriesTypes.GET_GAMES_BY_NAME_ASC -> "select * from Board_Games where Extension = 0;"
+            QueriesTypes.GET_EXTENSIONS_BY_NAME_ASC -> "select * from Board_Games where Extension = 1;"
+        }
+
+        val cursorData = database.rawQuery(query, null)
+
+        if (cursorData.moveToFirst()) {
+            do {
+                data.add(
+                    GameInfo(
+                        cursorData.getString(0),
+                        cursorData.getString(1),
+                        cursorData.getString(2),
+                        cursorData.getString(3),
+                        cursorData.getString(4).toBoolean(),
+                        cursorData.getString(5)
+                    )
+                )
+            } while (cursorData.moveToNext())
+        }
+        cursorData.close()
+        return data
+    }
 
     companion object {
         const val DATABASE_NAME = "Board_Games_Database.db"

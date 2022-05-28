@@ -66,11 +66,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         clearDataButton.setOnClickListener{
-            val userFile = File(this.filesDir.toString().plus("/user.json"))
-            val dataFile = File(this.filesDir.toString().plus("/data.xml"))
-            userFile.delete()
-            dataFile.delete()
+            val filesToClear = listOf("/user.json", "/gamesData.xml", "/extensionsData.xml")
+            filesToClear.stream().forEach { File(this.filesDir.toString().plus(it)).delete() }
             val intent = Intent(this, Settings::class.java)
+            startActivity(intent)
+        }
+
+        showDataTable.setOnClickListener{
+            val intent = Intent(this, GamesExtensionsTable::class.java)
             startActivity(intent)
         }
     }
@@ -127,22 +130,24 @@ class MainActivity : AppCompatActivity() {
                 XmlPullParser.START_DOCUMENT -> games = ArrayList()
                 XmlPullParser.START_TAG -> {
                     name = parser.name
-                    if (name == "items") {
-                        amountOfItems = parser.getAttributeValue(null, "totalitems").toInt()
-                    }
+                    when (name) {
+                        "items" -> amountOfItems = parser.getAttributeValue(null, "totalitems").toInt()
+                        "item" -> {
+                            game = GameInfo()
+                            game.id = parser.getAttributeValue(null, "objectid")
 
-                    if (name == "item"){
-                        game = GameInfo()
-                        game.id = parser.getAttributeValue(null, "objectid")
-
-                    } else if (game != null){
-                        when (name) {
-                            "name" -> game.gameName = parser.nextText()
-                            "yearpublished" -> game.yearPublished = parser.nextText()
-                            "thumbnail" -> game.image = parser.nextText()
-                            "rank" -> {
-                                if(parser.getAttributeValue(null, "name") == "boardgame"){
-                                    game.currentRank = parser.getAttributeValue(null, "value")
+                        } else -> {
+                            if (game != null) {
+                                when (name) {
+                                    "name" -> game.gameName = parser.nextText()
+                                    "yearpublished" -> game.yearPublished = parser.nextText()
+                                    "thumbnail" -> game.image = parser.nextText()
+                                    "rank" -> {
+                                        if (parser.getAttributeValue(null, "name") == "boardgame") {
+                                            game.currentRank =
+                                                parser.getAttributeValue(null, "value")
+                                        }
+                                    }
                                 }
                             }
                         }
