@@ -25,13 +25,13 @@
 
         <ScrollView
             android:id="@+id/tableScrollView"
-            android:layout_width="0dp"
-            android:layout_height="0dp">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <TableLayout
                 android:id="@+id/dataTable"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent" />
         </ScrollView>
     </LinearLayout>
 
