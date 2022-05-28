@@ -10,7 +10,11 @@ import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserException
+import org.xmlpull.v1.XmlPullParserFactory
 import java.io.File
+import java.io.IOException
 import java.lang.Exception
 import java.util.concurrent.Executors
 import javax.xml.parsers.DocumentBuilderFactory
@@ -65,39 +69,69 @@ class MainActivity : AppCompatActivity() {
         dataFile = "$filesDir/data.xml"
         val requestData = request.readRequest("https://boardgamegeek.com/xmlapi2/collection?username=${user.username}&stats=1")
         request.saveData(dataFile, requestData)
-        val xmlDoc: Document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(File(dataFile))
-        xmlDoc.documentElement.normalize()
-        val myDatabase = DatabaseHelper(this)
 
-        val amountOfGames : Node = xmlDoc.getElementsByTagName("items").item(0)
-        if (amountOfGames.nodeType === Node.ELEMENT_NODE) {
-            val elem = amountOfGames as Element
-            println(elem.getElementsByTagName("totalitems"))
+        val pullParserFactory: XmlPullParserFactory
+
+        try{
+            pullParserFactory = XmlPullParserFactory.newInstance()
+            val parser = pullParserFactory.newPullParser()
+            val inputStream = applicationContext.openFileInput("data.xml")
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
+            parser.setInput(inputStream, null)
+            val games = parseXml(parser)
+
+            for (game in games!!){
+                println(game.toString())
+            }
+
+
+        } catch (e: XmlPullParserException){
+            println(e.printStackTrace())
+        } catch (e: IOException){
+            println(e.printStackTrace())
         }
+    }
 
+    @Throws (XmlPullParserException::class, IOException::class)
+    private fun parseXml(parser: XmlPullParser): ArrayList<GameInfo>? {
+        var games: ArrayList<GameInfo>? = null
+        var eventType = parser.eventType
+        var game: GameInfo? = null
 
+        while (eventType != XmlPullParser.END_DOCUMENT){
+            var name: String
+            when (eventType){
+                XmlPullParser.START_DOCUMENT -> games = ArrayList()
+                XmlPullParser.START_TAG -> {
+                    name = parser.name
+                    println(name)
+                    if (name == "item"){
+                        game = GameInfo()
+                        game.id = parser.getAttributeValue(null, "objectid")
+                    } else if (game != null){
+                        when (name) {
+                            "name" -> game.gameName = parser.nextText()
+                            "yearpublished" -> game.yearPublished = parser.nextText()
+                            "thumbnail" -> game.image = parser.nextText()
+                            "rank" -> {
+                                if(parser.getAttributeValue(null, "id") == "1"){
+                                    game.currentRank = parser.getAttributeValue(null, "value")
+                                }
+                            }
+                        }
+                    }
+                }
 
-        val gameList: NodeList = xmlDoc.getElementsByTagName("item")
-        for (i in 0 until gameList.length) {
-            val game: Node = gameList.item(i)
-
-            if (game.nodeType === Node.ELEMENT_NODE) {
-                val elem = game as Element
-
-
-                try{
-                    myDatabase.addDataToSQL(
-                        elem.getElementsByTagName("name").item(0).textContent,
-                        elem.getElementsByTagName("yearpublished").item(0).textContent.toInt(),
-                        234203,
-                        elem.getElementsByTagName("image").item(0).textContent,
-                        elem.attributes.item(1).nodeValue.toLong()
-                    )
-                }catch (e: Exception){
-
+                XmlPullParser.END_TAG -> {
+                    name = parser.name
+                    if (name.equals("item", ignoreCase = true) && game != null){
+                        games!!.add(game)
+                    }
                 }
             }
+            eventType = parser.next()
         }
+        return games
     }
 
     private fun reloadRefreshDate() {

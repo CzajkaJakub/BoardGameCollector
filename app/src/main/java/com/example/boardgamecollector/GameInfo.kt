@@ -1,9 +1,14 @@
 package com.example.boardgamecollector
 
+
 class GameInfo {
     lateinit var id : String
     lateinit var gameName : String
-    lateinit var yearPublished : String
+    var yearPublished : String = ""
     lateinit var image : String
-    lateinit var currentRank : String
+    var currentRank : String = "0"
+
+    override fun toString(): String {
+        return "GameInfo(id='$id', gameName='$gameName', yearPublished='$yearPublished', image='$image', currentRank='$currentRank')"
+    }
 }
