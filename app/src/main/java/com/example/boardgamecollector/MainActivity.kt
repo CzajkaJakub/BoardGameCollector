@@ -3,6 +3,7 @@ package com.example.boardgamecollector
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -70,9 +71,8 @@ class MainActivity : AppCompatActivity() {
         dataFile = "$filesDir/data.xml"
         val requestData = request.readRequest("https://boardgamegeek.com/xmlapi2/collection?username=${user.username}&stats=1")
         request.saveData(dataFile, requestData)
-
         val pullParserFactory: XmlPullParserFactory
-
+        val databaseAccess = DatabaseHelper(this)
         try{
             pullParserFactory = XmlPullParserFactory.newInstance()
             val parser = pullParserFactory.newPullParser()
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             val games = parseXml(parser)
 
             for (game in games!!){
-                println(game.toString())
+                databaseAccess.addGameToDatabase(game)
             }
 
 

@@ -25,14 +25,14 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
         onCreate(sqLiteDatabase)
     }
 
-    fun addDataToSQL(gameTitle : String, dateOfRelease : Int, currentRankPosition : Int, image : String, gameId : Long){
+    fun addGameToDatabase(game: GameInfo) {
         val database : SQLiteDatabase = this.writableDatabase
         val contentValues = ContentValues()
-        contentValues.put(GAME_TITLE, gameTitle)
-        contentValues.put(DATE_OF_RELEASE, dateOfRelease)
-        contentValues.put(COLUMN_ID, gameId)
-        contentValues.put(CURRENT_RANK_POSITION, currentRankPosition)
-        contentValues.put(IMAGE, image)
+        contentValues.put(GAME_TITLE, game.gameName)
+        contentValues.put(DATE_OF_RELEASE, game.yearPublished)
+        contentValues.put(COLUMN_ID, game.id)
+        contentValues.put(CURRENT_RANK_POSITION, game.currentRank)
+        contentValues.put(IMAGE, game.image)
 
         database.insert(TABLE_NAME, null, contentValues)
     }
