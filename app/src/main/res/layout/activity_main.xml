@@ -41,7 +41,7 @@
         app:layout_constraintTop_toBottomOf="@+id/amountOfAdditionsLabel" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/reloadDataButton"
+        android:id="@+id/synchronizedDataButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="49dp"
@@ -51,5 +51,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/load_data_icon" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/clearDataButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="49dp"
+        android:layout_marginBottom="49dp"
+        android:clickable="true"
+        android:contentDescription="@string/next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_baseline_clear_24" />
 
 </android.support.constraint.ConstraintLayout>

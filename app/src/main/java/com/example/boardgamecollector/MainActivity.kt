@@ -3,7 +3,6 @@ package com.example.boardgamecollector
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -21,7 +20,7 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity() {
 
     private val mapper = jacksonObjectMapper()
-    lateinit var user : UserSettings
+    private lateinit var user : UserSettings
     private lateinit var dataFile : String
     private val request = Request()
 
@@ -58,11 +57,20 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun addListeners() {
-        reloadDataButton.setOnClickListener {
+        synchronizedDataButton.setOnClickListener {
             val executor = Executors.newSingleThreadExecutor()
             executor.execute {
                 parseXmlCollectionFile()
             }
+        }
+
+        clearDataButton.setOnClickListener{
+            val userFile = File(this.filesDir.toString().plus("/user.json"))
+            val dataFile = File(this.filesDir.toString().plus("/data.xml"))
+            userFile.delete()
+            dataFile.delete()
+            val intent = Intent(this, Settings::class.java)
+            startActivity(intent)
         }
     }
 
@@ -118,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                             "yearpublished" -> game.yearPublished = parser.nextText()
                             "thumbnail" -> game.image = parser.nextText()
                             "rank" -> {
-                                if(parser.getAttributeValue(null, "id") == "1"){
+                                if(parser.getAttributeValue(null, "name") == "boardgame"){
                                     game.currentRank = parser.getAttributeValue(null, "value")
 
                                     when (game.currentRank) {
