@@ -11,11 +11,14 @@ import androidx.annotation.RequiresApi
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_games_extensions_table.*
 import java.lang.Exception
+import kotlin.collections.ArrayList
 
 
 class GamesExtensionsTable : AppCompatActivity() {
 
     private lateinit var database: DatabaseHelper
+    private lateinit var gameData: ArrayList<GameInfo>
+    private var sortedType: SortedTypes = SortedTypes.GAME_NAME
 
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -29,18 +32,18 @@ class GamesExtensionsTable : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.N)
     private fun addListeners() {
         showGamesButton.setOnClickListener {
-            val data = database.getDataGamesExtensions(QueriesTypes.GET_GAMES_BY_NAME_ASC)
-            createTable(data)
+            gameData = database.getDataGamesExtensions(QueriesTypes.GET_GAMES_BY_NAME_ASC)
+            createTable()
         }
 
         showExtensionsButton.setOnClickListener {
-            val data = database.getDataGamesExtensions(QueriesTypes.GET_EXTENSIONS_BY_NAME_ASC)
-            createTable(data)
+            gameData = database.getDataGamesExtensions(QueriesTypes.GET_EXTENSIONS_BY_NAME_ASC)
+            createTable()
         }
 
         showAllButton.setOnClickListener {
-            val data = database.getDataGamesExtensions(QueriesTypes.GET_ALL_BY_NAME_ASC)
-            createTable(data)
+            gameData = database.getDataGamesExtensions(QueriesTypes.GET_ALL_BY_NAME_ASC)
+            createTable()
         }
 
         backToMainButton.setOnClickListener {
@@ -50,10 +53,7 @@ class GamesExtensionsTable : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    private fun createTable(data: ArrayList<GameInfo>) {
-
-        dataTable.removeAllViews()
-
+    private fun createTable() {
         //header
         val tableHeader = TableRow(this)
         val headers = listOf("Id", "Game Title", "Release Date", "Current rank", "Extension", "Image")
@@ -67,6 +67,44 @@ class GamesExtensionsTable : AppCompatActivity() {
         )
 
         for ((index, value) in textViews.withIndex()) {
+
+
+            when (headers[index]) {
+                "Game Title" -> {
+                    value.setOnClickListener {
+                        if(sortedType == SortedTypes.GAME_NAME) {
+                            gameData.reverse()
+                        } else {
+                            sortedType = SortedTypes.GAME_NAME
+                            gameData.sortBy { it.gameName }
+                        }
+                        fillTableWithData()
+                    }
+                }
+                "Release Date" -> {
+                    value.setOnClickListener {
+                        if(sortedType == SortedTypes.DATE_RELEASE) {
+                            gameData.reverse()
+                        } else {
+                            sortedType = SortedTypes.DATE_RELEASE
+                            gameData.sortBy { it.getIntYear() }
+                        }
+                        fillTableWithData()
+                    }
+                }
+                "Current rank" -> {
+                    value.setOnClickListener {
+                        if(sortedType == SortedTypes.CURRENT_RANK){
+                            gameData.reverse()
+                        } else {
+                            sortedType = SortedTypes.CURRENT_RANK
+                            gameData.sortBy { it.getIntRank() }
+                        }
+                        fillTableWithData()
+                    }
+                }
+            }
+
             value.setTextColor(Color.parseColor("#19678b"))
             value.setBackgroundColor(Color.parseColor("#1F2739"))
             value.textSize = 20.toFloat()
@@ -76,11 +114,16 @@ class GamesExtensionsTable : AppCompatActivity() {
             tableHeader.addView(value)
         }
         dataTable.addView(tableHeader)
+        fillTableWithData()
 
+    }
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun fillTableWithData() {
         //data
+        dataTable.removeViews(1, dataTable.childCount - 1)
         var rowNum = 0
-        data.stream().forEach {
+        gameData.stream().forEach {
             rowNum++
             val valueTableRow = TableRow(this)
             val valueHeaders =
@@ -125,8 +168,6 @@ class GamesExtensionsTable : AppCompatActivity() {
             }
 
         }
-
-
     }
 
 }

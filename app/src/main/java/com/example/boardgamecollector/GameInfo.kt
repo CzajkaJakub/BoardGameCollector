@@ -16,5 +16,21 @@ class GameInfo(
         return "GameInfo(id='$id', gameName='$gameName', yearPublished='$yearPublished', image='$image', currentRank='$currentRank', extension=$extension)"
     }
 
+    fun getIntYear(): Int{
+        return try {
+            yearPublished.toInt()
+        } catch (e: Exception){
+            0
+        }
+    }
+
+    fun getIntRank(): Int{
+        return try {
+            currentRank.toInt()
+        } catch (e: Exception){
+            0
+        }
+    }
+
 
 }
