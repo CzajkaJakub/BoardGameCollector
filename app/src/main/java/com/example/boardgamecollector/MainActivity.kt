@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkUsersSettings(): Boolean {
         val userPath = this.filesDir.toString().plus("/user.json")
+        println(userPath)
         return if(File(userPath).exists()){
             setContentView(R.layout.activity_main)
             readUserAndReloadFields(userPath)
@@ -68,11 +69,12 @@ class MainActivity : AppCompatActivity() {
         clearDataButton.setOnClickListener{
             val filesToClear = listOf("/user.json", "/gamesData.xml", "/extensionsData.xml")
             filesToClear.stream().forEach { File(this.filesDir.toString().plus(it)).delete() }
+            val database = DatabaseHelper(this)
+            database.clearDatabase()
             val intent = Intent(this, Settings::class.java)
             startActivity(intent)
         }
 
-        //TODO - kasowanie bazy danych
 
         showDataTable.setOnClickListener{
             val intent = Intent(this, GamesExtensionsTable::class.java)
@@ -106,7 +108,7 @@ class MainActivity : AppCompatActivity() {
             parser.setInput(inputStreamExtensions, null)
             val (listOfExtensions, amountOfExtensions) = parseXml(parser)
 
-            listOfGames!!.stream().forEach { databaseAccess.addGameToDatabase(it) }
+            listOfGames!!.stream().forEach { databaseAccess.addGameToDatabase(it)}
             listOfExtensions!!.stream().forEach { it.extension = true; databaseAccess.addGameToDatabase(it) }
 
             reloadRefreshDate(amountOfGames, amountOfExtensions)

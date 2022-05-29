@@ -27,6 +27,11 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
         onCreate(sqLiteDatabase)
     }
 
+    fun clearDatabase() {
+        val database : SQLiteDatabase = this.writableDatabase
+        database.execSQL("DELETE FROM $TABLE_NAME_GAMES")
+    }
+
     fun addGameToDatabase(game: GameInfo) {
         val database : SQLiteDatabase = this.writableDatabase
         val contentValues = ContentValues()
@@ -62,7 +67,7 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
                         cursorData.getString(1),
                         cursorData.getString(2),
                         cursorData.getString(3),
-                        cursorData.getString(4).toBoolean(),
+                        cursorData.getString(4) == "1",
                         cursorData.getString(5)
                     )
                 )
