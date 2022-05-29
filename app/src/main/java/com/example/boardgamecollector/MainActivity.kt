@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -16,6 +17,7 @@ import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.Executors
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,7 +37,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkUsersSettings(): Boolean {
         val userPath = this.filesDir.toString().plus("/user.json")
-        println(userPath)
         return if(File(userPath).exists()){
             setContentView(R.layout.activity_main)
             readUserAndReloadFields(userPath)
@@ -59,10 +60,31 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun addListeners() {
+
         synchronizedDataButton.setOnClickListener {
-            val executor = Executors.newSingleThreadExecutor()
-            executor.execute {
-                parseXmlCollectionFile()
+            if (user.lastSynchronizedDate != "Synchronize to get data!" &&
+                LocalDateTime.parse(
+                    user.lastSynchronizedDate,
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                ).dayOfYear == LocalDateTime.now().dayOfYear
+            ) {
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.confirmation_title)
+                    .setMessage(R.string.confirmation_message)
+                    .setPositiveButton(R.string.confirmation_yes) { dialog, which ->
+                        val executor = Executors.newSingleThreadExecutor()
+                        executor.execute {
+                            parseXmlCollectionFile()
+                        }
+                    }
+                    .setNegativeButton(R.string.confirmation_no, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show()
+            } else {
+                val executor = Executors.newSingleThreadExecutor()
+                executor.execute {
+                    parseXmlCollectionFile()
+                }
             }
         }
 

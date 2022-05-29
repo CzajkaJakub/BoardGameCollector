@@ -14,4 +14,11 @@
     <string name="DataTable" />
     <string name="show_all">Show All</string>
     <string name="back">&#128281;</string>
+    <string name="extensionTrue">&#9989;</string>
+    <string name="extensionFalse">&#10060;</string>
+    <string name="confirmation_message">Your last update was today, rankking on website didn\'t refreash. Do you want to continue?</string>
+    <string name="confirmation_yes">yes</string>
+    <string name="confirmation_no">No</string>
+    <string name="confirmation_title">Refresh data</string>
+
 </resources>

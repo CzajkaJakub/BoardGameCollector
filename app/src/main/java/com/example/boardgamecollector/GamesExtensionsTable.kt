@@ -13,7 +13,6 @@ import kotlinx.android.synthetic.main.activity_games_extensions_table.*
 import java.lang.Exception
 import kotlin.collections.ArrayList
 
-
 class GamesExtensionsTable : AppCompatActivity() {
 
     private lateinit var database: DatabaseHelper
@@ -68,9 +67,16 @@ class GamesExtensionsTable : AppCompatActivity() {
 
         for ((index, value) in textViews.withIndex()) {
 
+            value.setTextColor(Color.parseColor("#19678b"))
+            value.setBackgroundColor(Color.parseColor("#1F2739"))
+            value.textSize = 20.toFloat()
+            value.gravity = Gravity.CENTER
+            value.text = headers[index]
+            value.setPadding(30, 30, 30, 30)
 
             when (headers[index]) {
                 "Game Title" -> {
+                    value.setTextColor(Color.parseColor("#FF00FF37"))
                     value.setOnClickListener {
                         if(sortedType == SortedTypes.GAME_NAME) {
                             gameData.reverse()
@@ -82,6 +88,7 @@ class GamesExtensionsTable : AppCompatActivity() {
                     }
                 }
                 "Release Date" -> {
+                    value.setTextColor(Color.parseColor("#FF00FF37"))
                     value.setOnClickListener {
                         if(sortedType == SortedTypes.DATE_RELEASE) {
                             gameData.reverse()
@@ -93,6 +100,7 @@ class GamesExtensionsTable : AppCompatActivity() {
                     }
                 }
                 "Current rank" -> {
+                    value.setTextColor(Color.parseColor("#FF00FF37"))
                     value.setOnClickListener {
                         if(sortedType == SortedTypes.CURRENT_RANK){
                             gameData.reverse()
@@ -104,13 +112,6 @@ class GamesExtensionsTable : AppCompatActivity() {
                     }
                 }
             }
-
-            value.setTextColor(Color.parseColor("#19678b"))
-            value.setBackgroundColor(Color.parseColor("#1F2739"))
-            value.textSize = 20.toFloat()
-            value.gravity = Gravity.CENTER
-            value.text = headers[index]
-            value.setPadding(30, 30, 30, 30)
             tableHeader.addView(value)
         }
         dataTable.addView(tableHeader)
@@ -137,16 +138,20 @@ class GamesExtensionsTable : AppCompatActivity() {
             )
 
             for ((index, value) in valueTextViews.withIndex()) {
-                when (index) {
-                    0 -> value.setTextColor(Color.parseColor("#FB667A"))
-                    else -> value.setTextColor(Color.parseColor("#A7A1AE"))
-                }
+
                 value.text = valueHeaders[index].toString()
                 value.gravity = Gravity.CENTER
                 value.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT)
                 value.maxWidth = 300
                 value.textSize = 15.toFloat()
                 value.setPadding(30, 30, 30, 30)
+
+                when (index) {
+                    0 -> value.setTextColor(Color.parseColor("#FB667A"))
+                    4 -> if (it.extension) value.text = getString(R.string.extensionTrue) else value.text = getString(R.string.extensionFalse)
+                    else -> value.setTextColor(Color.parseColor("#A7A1AE"))
+                }
+
                 valueTableRow.addView(value)
             }
 
