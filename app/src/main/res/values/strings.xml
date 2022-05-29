@@ -11,4 +11,5 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="show_my_games">Show my games</string>
     <string name="show_my_extensions">Show my extensions</string>
+    <string name="DataTable" />
 </resources>

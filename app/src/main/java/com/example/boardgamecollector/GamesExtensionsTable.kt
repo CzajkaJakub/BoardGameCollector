@@ -1,21 +1,22 @@
 package com.example.boardgamecollector
 
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
+import android.support.v7.app.AppCompatActivity
+import android.view.Gravity
+import android.widget.*
 import androidx.annotation.RequiresApi
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_games_extensions_table.*
-import kotlin.collections.ArrayList
+import java.net.URL
 
 
 class GamesExtensionsTable : AppCompatActivity() {
 
     private lateinit var database: DatabaseHelper
-    private lateinit var tableData: TableLayout
+
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,36 +41,53 @@ class GamesExtensionsTable : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun createTable(data: ArrayList<GameInfo>) {
-        tableData = findViewById(R.id.dataTable)
-        tableData.removeAllViews()
+
+        val dataTable = dataTable
+        val tableHeader = TableRow(this)
+
         val headers = listOf("id", "Game Title", "Release Date", "Current rank", "Extension", "Img")
-        val textViews = listOf(TextView(this), TextView(this), TextView(this), TextView(this), TextView(this), TextView(this))
-        val tableRow = TableRow(this)
+        val textViews = listOf(
+            TextView(this),
+            TextView(this),
+            TextView(this),
+            TextView(this),
+            TextView(this),
+            TextView(this)
+        )
+
         for ((index, value) in textViews.withIndex()) {
-            value.setTextColor(Color.RED)
+            value.setTextColor(Color.WHITE)
+            value.gravity = Gravity.CENTER
             value.text = headers[index]
-            tableRow.addView(value)
+            tableHeader.addView(value)
         }
-        tableData.addView(tableRow)
+        dataTable.addView(tableHeader)
 
         data.stream().forEach {
+            val valueTableRow = TableRow(this)
             val valueHeaders =
-                listOf(it.id, it.gameName, it.yearPublished, it.currentRank, it.extension, it.image)
+                listOf(it.id, it.gameName, it.yearPublished, it.currentRank, it.extension)
             val valueTextViews = listOf(
-                TextView(this),
                 TextView(this),
                 TextView(this),
                 TextView(this),
                 TextView(this),
                 TextView(this)
             )
-            val valueTableRow = TableRow(this)
+
             for ((index, value) in valueTextViews.withIndex()) {
-                value.setTextColor(Color.BLUE)
+                value.setTextColor(Color.WHITE)
                 value.text = valueHeaders[index].toString()
                 valueTableRow.addView(value)
             }
-            tableData.addView(valueTableRow)
+
+            val imageView = ImageView(this)
+            Picasso.get().load(it.image).into(imageView);
+            valueTableRow.addView(imageView)
+            dataTable.addView(valueTableRow)
         }
+
+
     }
+
 }

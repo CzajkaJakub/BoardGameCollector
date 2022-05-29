@@ -34,7 +34,9 @@ android {
     buildFeatures {
         viewBinding true
     }
+
 }
+
 
 dependencies {
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
@@ -44,12 +46,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")
     implementation("androidx.test:runner:1.5.0-alpha03")
-
-
-
-
-
-
-
+    implementation 'com.squareup.picasso:picasso:2.8'
 
 }

@@ -72,6 +72,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        //TODO - kasowanie bazy danych
+
         showDataTable.setOnClickListener{
             val intent = Intent(this, GamesExtensionsTable::class.java)
             startActivity(intent)
@@ -168,11 +170,11 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun reloadRefreshDate(amountOfGames: Int, amountOfExtensions: Int) {
-        user.amountOfGame = amountOfGames
-        user.amountOfExtensions = amountOfExtensions
         val currentDate = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val formatted = currentDate.format(formatter)
+        user.amountOfGame = amountOfGames
+        user.amountOfExtensions = amountOfExtensions
         user.lastSynchronizedDate = formatted
         saveUserData(user)
     }
