@@ -55,6 +55,7 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
         val query : String = when (getGamesByNameAsc){
             QueriesTypes.GET_GAMES_BY_NAME_ASC -> "select * from Board_Games where Extension = 0;"
             QueriesTypes.GET_EXTENSIONS_BY_NAME_ASC -> "select * from Board_Games where Extension = 1;"
+            QueriesTypes.GET_ALL_BY_NAME_ASC -> "select * from Board_Games"
         }
 
         val cursorData = database.rawQuery(query, null)
@@ -67,7 +68,7 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
                         cursorData.getString(1),
                         cursorData.getString(2),
                         cursorData.getString(3),
-                        cursorData.getString(4) == "1",
+                        cursorData.getString(4).equals("1"),
                         cursorData.getString(5)
                     )
                 )

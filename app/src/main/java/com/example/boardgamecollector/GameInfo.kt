@@ -9,7 +9,7 @@ class GameInfo(
     var extension: Boolean,
     var image: String
 ) {
-    constructor() : this("", "", "", "", false, "")
+    constructor() : this("", "", "No Data", "No Data", false, "No Data")
 
 
     override fun toString(): String {

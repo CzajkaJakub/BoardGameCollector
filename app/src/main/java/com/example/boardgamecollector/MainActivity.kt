@@ -103,15 +103,15 @@ class MainActivity : AppCompatActivity() {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
 
             parser.setInput(inputStreamGames, null)
-            val (listOfGames, amountOfGames) = parseXml(parser)
+            val listOfGames = parseXml(parser)
 
             parser.setInput(inputStreamExtensions, null)
-            val (listOfExtensions, amountOfExtensions) = parseXml(parser)
+            val listOfExtensions = parseXml(parser)
 
             listOfGames!!.stream().forEach { databaseAccess.addGameToDatabase(it)}
             listOfExtensions!!.stream().forEach { it.extension = true; databaseAccess.addGameToDatabase(it) }
 
-            reloadRefreshDate(amountOfGames, amountOfExtensions)
+            reloadRefreshDate(listOfGames.size, listOfExtensions.size)
 
         } catch (e: XmlPullParserException){
             println(e.printStackTrace())
@@ -122,11 +122,10 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Throws (XmlPullParserException::class, IOException::class)
-    private fun parseXml(parser: XmlPullParser): Pair<ArrayList<GameInfo>?, Int> {
+    private fun parseXml(parser: XmlPullParser): ArrayList<GameInfo>? {
         var games: ArrayList<GameInfo>? = null
         var eventType = parser.eventType
         var game: GameInfo? = null
-        var amountOfItems = 0
 
         while (eventType != XmlPullParser.END_DOCUMENT){
             var name: String
@@ -135,7 +134,6 @@ class MainActivity : AppCompatActivity() {
                 XmlPullParser.START_TAG -> {
                     name = parser.name
                     when (name) {
-                        "items" -> amountOfItems = parser.getAttributeValue(null, "totalitems").toInt()
                         "item" -> {
                             game = GameInfo()
                             game.id = parser.getAttributeValue(null, "objectid")
@@ -167,7 +165,7 @@ class MainActivity : AppCompatActivity() {
             }
             eventType = parser.next()
         }
-        return Pair(games, amountOfItems)
+        return games
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -175,7 +173,7 @@ class MainActivity : AppCompatActivity() {
         val currentDate = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val formatted = currentDate.format(formatter)
-        user.amountOfGame = amountOfGames
+        user.amountOfGame = amountOfGames - amountOfExtensions
         user.amountOfExtensions = amountOfExtensions
         user.lastSynchronizedDate = formatted
         saveUserData(user)

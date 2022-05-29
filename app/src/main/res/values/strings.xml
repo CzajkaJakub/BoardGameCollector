@@ -12,4 +12,6 @@
     <string name="show_my_games">Show my games</string>
     <string name="show_my_extensions">Show my extensions</string>
     <string name="DataTable" />
+    <string name="show_all">Show All</string>
+    <string name="back">&#128281;</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.boardgamecollector
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -36,6 +37,16 @@ class GamesExtensionsTable : AppCompatActivity() {
             val data = database.getDataGamesExtensions(QueriesTypes.GET_EXTENSIONS_BY_NAME_ASC)
             createTable(data)
         }
+
+        showAllButton.setOnClickListener {
+            val data = database.getDataGamesExtensions(QueriesTypes.GET_ALL_BY_NAME_ASC)
+            createTable(data)
+        }
+
+        backToMainButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -68,11 +79,12 @@ class GamesExtensionsTable : AppCompatActivity() {
 
 
         //data
+        var rowNum = 0
         data.stream().forEach {
-            println(it)
+            rowNum++
             val valueTableRow = TableRow(this)
             val valueHeaders =
-                listOf(it.id, it.gameName, it.yearPublished, it.currentRank, it.extension)
+                listOf(rowNum, it.gameName, it.yearPublished, it.currentRank, it.extension)
             val valueTextViews = listOf(
                 TextView(this),
                 TextView(this),
@@ -106,7 +118,7 @@ class GamesExtensionsTable : AppCompatActivity() {
                 textView.setTextColor(Color.WHITE)
                 textView.setPadding(30, 30, 30, 30)
                 textView.gravity = Gravity.CENTER
-                textView.text = ""
+                textView.text = it.image
                 valueTableRow.addView(textView)
             } finally {
                 dataTable.addView(valueTableRow)
