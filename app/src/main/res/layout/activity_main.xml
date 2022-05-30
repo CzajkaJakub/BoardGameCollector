@@ -6,72 +6,155 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/usernameView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="194dp"
-        android:layout_marginTop="38dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/amountOfGamesLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="43dp"
-        app:layout_constraintEnd_toStartOf="@+id/amountOfAdditionsLabel"
-        app:layout_constraintStart_toStartOf="@+id/amountOfAdditionsLabel"
-        app:layout_constraintTop_toBottomOf="@+id/usernameView" />
-
-    <TextView
-        android:id="@+id/amountOfAdditionsLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
-        app:layout_constraintStart_toStartOf="@+id/usernameView"
-        app:layout_constraintTop_toBottomOf="@+id/amountOfGamesLabel" />
-
-    <TextView
-        android:id="@+id/lastSynchronizedDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="41dp"
-        app:layout_constraintStart_toStartOf="@+id/amountOfAdditionsLabel"
-        app:layout_constraintTop_toBottomOf="@+id/amountOfAdditionsLabel" />
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/synchronizedDataButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="49dp"
-        android:layout_marginBottom="49dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
         android:clickable="true"
-        android:contentDescription="@string/next"
+        android:contentDescription="@string/synchronize_button"
+        android:focusable="true"
+        app:backgroundTint="#154C79"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/load_data_icon" />
+        app:srcCompat="@drawable/ic_baseline_get_app_36"
+        tools:ignore="ImageContrastCheck" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/clearDataButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="49dp"
-        android:layout_marginBottom="49dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginBottom="50dp"
+        android:backgroundTint="#154C79"
         android:clickable="true"
-        android:contentDescription="@string/next"
+        android:contentDescription="@string/clear_data_button"
+        android:focusable="true"
+        app:backgroundTint="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_baseline_clear_24" />
+        app:srcCompat="@drawable/ic_baseline_delete_outline_36"
+        tools:ignore="ImageContrastCheck" />
 
     <Button
         android:id="@+id/showDataTable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="38dp"
-        android:layout_marginBottom="199dp"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/rounded_button"
+        android:padding="20sp"
+        android:text="@string/show_my_boardgames_button"
+        app:layout_constraintBottom_toTopOf="@+id/synchronizedDataButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/synchronizeProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="30dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/showDataTable"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="64dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/user_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="2sp"
+            android:text="@string/user"
+            android:textColor="#08E9FF"
+            android:textSize="16sp"
+            android:textStyle="bold|italic" />
+
+        <TextView
+            android:id="@+id/usernameView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25sp"
+            android:gravity="center"
+            android:padding="10sp"
+            android:textColor="#5BE43C" />
+
+        <TextView
+            android:id="@+id/amountOfGamesHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="2sp"
+            android:text="@string/amount_of_games"
+            android:textColor="#08E9FF"
+            android:textSize="16sp"
+            android:textStyle="bold|italic" />
+
+        <TextView
+            android:id="@+id/amountOfGamesLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25sp"
+            android:gravity="center"
+            android:padding="10sp"
+            android:textColor="#5BE43C" />
+
+        <TextView
+            android:id="@+id/amountOfExtensionsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="2sp"
+            android:text="@string/amount_of_extensions"
+            android:textColor="#08E9FF"
+            android:textSize="16sp"
+            android:textStyle="bold|italic" />
+
+        <TextView
+            android:id="@+id/amountOfAdditionsLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25sp"
+            android:gravity="center"
+            android:padding="10sp"
+            android:textColor="#5BE43C" />
+
+        <TextView
+            android:id="@+id/lastSynchronizedDateHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="2sp"
+            android:text="@string/last_synchronized_date"
+            android:textColor="#08E9FF"
+            android:textSize="16sp"
+            android:textStyle="bold|italic" />
+
+        <TextView
+            android:id="@+id/lastSynchronizedDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25sp"
+            android:gravity="center"
+            android:padding="10sp"
+            android:textColor="#5BE43C" />
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

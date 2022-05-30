@@ -20,5 +20,13 @@
     <string name="confirmation_yes">yes</string>
     <string name="confirmation_no">No</string>
     <string name="confirmation_title">Refresh data</string>
+    <string name="synchronize_button">Synchronize data</string>
+    <string name="clear_data_button">Clear data</string>
+    <string name="show_my_boardgames_button">Show my boardgames</string>
+    <string name="last_synchronized_date">Last synchronized date</string>
+    <string name="amount_of_games">Amount of games</string>
+    <string name="user">User</string>
+    <string name="amount_of_extensions">Amount of extensions</string>
+
 
 </resources>
