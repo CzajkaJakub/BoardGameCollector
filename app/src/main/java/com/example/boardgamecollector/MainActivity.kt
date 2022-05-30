@@ -1,9 +1,11 @@
 package com.example.boardgamecollector
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.widget.ProgressBar
@@ -122,9 +124,14 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    @SuppressLint("RestrictedApi")
     @RequiresApi(Build.VERSION_CODES.O)
     private fun parseXmlCollectionFile() {
         saveRequestDataToFile()
+
+        runOnUiThread{
+            synchronizedDataButton.visibility = FloatingActionButton.INVISIBLE
+        }
 
         val pullParserFactory: XmlPullParserFactory
 
@@ -234,6 +241,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("RestrictedApi")
     @RequiresApi(Build.VERSION_CODES.O)
     private fun reloadRefreshDate() {
         val currentDate = LocalDateTime.now()
@@ -244,6 +252,10 @@ class MainActivity : AppCompatActivity() {
         user.amountOfExtensions = amountOfExtensions
         user.lastSynchronizedDate = formatted
         saveUserData(user)
+
+        runOnUiThread{
+            synchronizedDataButton.visibility = FloatingActionButton.VISIBLE
+        }
     }
 
     private fun saveUserData(user: UserSettings) {
