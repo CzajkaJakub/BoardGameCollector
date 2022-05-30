@@ -33,6 +33,7 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
     }
 
     fun addGameToDatabase(game: GameInfo) {
+        println(game)
         val database : SQLiteDatabase = this.writableDatabase
         val contentValues = ContentValues()
         contentValues.put(GAME_TITLE, game.gameName)
@@ -75,6 +76,10 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
             } while (cursorData.moveToNext())
         }
         cursorData.close()
+
+        data.forEach {
+            println(it)
+        }
         return data
     }
 

@@ -27,6 +27,9 @@
     <string name="amount_of_games">Amount of games</string>
     <string name="user">User</string>
     <string name="amount_of_extensions">Amount of extensions</string>
+    <string name="textview">TextView</string>
+    <string name="progressBarTitleExtension">Downloading data about extensions</string>
+    <string name="progressBarTitleGames">Downloading data about games</string>
 
 
 </resources>
