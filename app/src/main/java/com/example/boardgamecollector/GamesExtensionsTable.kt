@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
+import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.squareup.picasso.Picasso
@@ -32,17 +33,17 @@ class GamesExtensionsTable : AppCompatActivity() {
     private fun addListeners() {
         showGamesButton.setOnClickListener {
             gameData = database.getDataGamesExtensions(QueriesTypes.GET_GAMES_BY_NAME_ASC)
-            createTable()
+            createHeaders()
         }
 
         showExtensionsButton.setOnClickListener {
             gameData = database.getDataGamesExtensions(QueriesTypes.GET_EXTENSIONS_BY_NAME_ASC)
-            createTable()
+            createHeaders()
         }
 
         showAllButton.setOnClickListener {
             gameData = database.getDataGamesExtensions(QueriesTypes.GET_ALL_BY_NAME_ASC)
-            createTable()
+            createHeaders()
         }
 
         backToMainButton.setOnClickListener {
@@ -52,10 +53,11 @@ class GamesExtensionsTable : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    private fun createTable() {
+    private fun createHeaders() {
         //header
         val tableHeader = TableRow(this)
         val headers = listOf("Id", "Game Title", "Release Date", "Current rank", "Extension", "Image")
+
         val textViews = listOf(
             TextView(this),
             TextView(this),
@@ -116,7 +118,6 @@ class GamesExtensionsTable : AppCompatActivity() {
         }
         dataTable.addView(tableHeader)
         fillTableWithData()
-
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -151,28 +152,26 @@ class GamesExtensionsTable : AppCompatActivity() {
                     4 -> if (it.extension) value.text = getString(R.string.extensionTrue) else value.text = getString(R.string.extensionFalse)
                     else -> value.setTextColor(Color.parseColor("#A7A1AE"))
                 }
-
                 valueTableRow.addView(value)
             }
-
-
-            try{
-                val imageView = ImageView(this)
-                imageView.setPadding(30, 30, 30, 30)
-                Picasso.get().load(it.image).resize(250, 0).into(imageView)
-                valueTableRow.addView(imageView)
-            } catch (e: Exception){
-                val textView = TextView(this)
-                textView.setTextColor(Color.WHITE)
-                textView.setPadding(30, 30, 30, 30)
-                textView.gravity = Gravity.CENTER
-                textView.text = it.image
-                valueTableRow.addView(textView)
-            } finally {
-                dataTable.addView(valueTableRow)
-            }
-
+            tryLoadImages(valueTableRow, it)
         }
     }
 
+    private fun tryLoadImages(valueTableRow: TableRow, gameInfo: GameInfo) {
+        var imageView : View? = null
+        try{
+            imageView = ImageView(this)
+            Picasso.get().load(gameInfo.image).resize(250, 0).into(imageView)
+        } catch (e: Exception){
+            imageView = TextView(this)
+            imageView.setTextColor(Color.WHITE)
+            imageView.text = gameInfo.image
+            imageView.gravity = Gravity.CENTER
+        } finally {
+            imageView!!.setPadding(30, 30, 30, 30)
+            valueTableRow.addView(imageView)
+            dataTable.addView(valueTableRow)
+        }
+    }
 }

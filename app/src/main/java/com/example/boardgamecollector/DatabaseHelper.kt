@@ -9,7 +9,6 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
     context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     override fun onCreate(sqLiteDatabase: SQLiteDatabase) {
-
         val queryGames = "CREATE TABLE $TABLE_NAME_GAMES" +
                 " ( $COLUMN_ID LONG PRIMARY KEY," +
                 " $GAME_TITLE TEXT," +
@@ -18,24 +17,26 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
                 " $EXTENSION BOOLEAN," +
                 " $IMAGE TEXT);"
 
-
         sqLiteDatabase.execSQL(queryGames)
+        sqLiteDatabase.close()
     }
 
     override fun onUpgrade(sqLiteDatabase: SQLiteDatabase, i: Int, i1: Int) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_NAME_GAMES")
         onCreate(sqLiteDatabase)
+        sqLiteDatabase.close()
     }
 
-    fun clearDatabase() {
+    fun truncateDatabase() {
         val database : SQLiteDatabase = this.writableDatabase
         database.execSQL("DELETE FROM $TABLE_NAME_GAMES")
+        database.close()
     }
 
     fun addGameToDatabase(game: GameInfo) {
-        println(game)
         val database : SQLiteDatabase = this.writableDatabase
         val contentValues = ContentValues()
+
         contentValues.put(GAME_TITLE, game.gameName)
         contentValues.put(DATE_OF_RELEASE, game.yearPublished)
         contentValues.put(COLUMN_ID, game.id)
@@ -51,8 +52,10 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
     }
 
     fun getDataGamesExtensions(getGamesByNameAsc: QueriesTypes): ArrayList<GameInfo> {
+
         val data = ArrayList<GameInfo>()
         val database : SQLiteDatabase = this.readableDatabase
+
         val query : String = when (getGamesByNameAsc){
             QueriesTypes.GET_GAMES_BY_NAME_ASC -> "select * from Board_Games where Extension = 0;"
             QueriesTypes.GET_EXTENSIONS_BY_NAME_ASC -> "select * from Board_Games where Extension = 1;"
@@ -76,29 +79,20 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
             } while (cursorData.moveToNext())
         }
         cursorData.close()
-
-        data.forEach {
-            println(it)
-        }
+        database.close()
         return data
     }
 
-    fun getAmountOfGames(): Int {
+    fun getAmountOfGames(): Pair<Int, Int> {
         val database : SQLiteDatabase = this.readableDatabase
-        val cursorData = database.rawQuery("select count(*) from Board_Games group by Extension having Extension = 0;", null)
+        val cursorData = database.rawQuery("select count(*) from Board_Games group by Extension;", null)
         cursorData.moveToFirst()
-        val amount = cursorData.getInt(0)
+        val amountOfGames = cursorData.getInt(0)
+        cursorData.moveToNext()
+        val amountOfExtensions = cursorData.getInt(0)
         cursorData.close()
-        return amount
-    }
-
-    fun getAmountOfExtensions(): Int {
-        val database : SQLiteDatabase = this.readableDatabase
-        val cursorData = database.rawQuery("select count(*) from Board_Games group by Extension having Extension = 1;", null)
-        cursorData.moveToFirst()
-        val amount = cursorData.getInt(0)
-        cursorData.close()
-        return amount
+        database.close()
+        return Pair(amountOfGames, amountOfExtensions)
     }
 
     companion object {

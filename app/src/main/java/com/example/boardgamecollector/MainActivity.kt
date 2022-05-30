@@ -41,6 +41,9 @@ class MainActivity : AppCompatActivity() {
         val userPath = this.filesDir.toString().plus("/user.json")
         return if(File(userPath).exists()){
             setContentView(R.layout.activity_main)
+            databaseAccess = DatabaseHelper(this)
+            dataFileGames = "$filesDir/gamesData.xml"
+            dataFileExtensions = "$filesDir/extensionsData.xml"
             readUserAndReloadFields(userPath)
             true
         } else {
@@ -62,26 +65,9 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun addListeners() {
-        databaseAccess = DatabaseHelper(this)
         synchronizedDataButton.setOnClickListener {
-            if (user.lastSynchronizedDate != "Synchronize to get data!" &&
-                LocalDateTime.parse(
-                    user.lastSynchronizedDate,
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                ).dayOfYear == LocalDateTime.now().dayOfYear
-            ) {
-                AlertDialog.Builder(this)
-                    .setTitle(R.string.confirmation_title)
-                    .setMessage(R.string.confirmation_message)
-                    .setPositiveButton(R.string.confirmation_yes) { dialog, which ->
-                        val executor = Executors.newSingleThreadExecutor()
-                        executor.execute {
-                            parseXmlCollectionFile()
-                        }
-                    }
-                    .setNegativeButton(R.string.confirmation_no, null)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show()
+            if(checkLastSynchronizedDate()){
+                showWarningDialog()
             } else {
                 val executor = Executors.newSingleThreadExecutor()
                 executor.execute {
@@ -93,8 +79,7 @@ class MainActivity : AppCompatActivity() {
         clearDataButton.setOnClickListener{
             val filesToClear = listOf("/user.json", "/gamesData.xml", "/extensionsData.xml")
             filesToClear.stream().forEach { File(this.filesDir.toString().plus(it)).delete() }
-            val database = DatabaseHelper(this)
-            database.clearDatabase()
+            databaseAccess.truncateDatabase()
             val intent = Intent(this, Settings::class.java)
             startActivity(intent)
         }
@@ -107,18 +92,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    private fun checkLastSynchronizedDate(): Boolean {
+        if(user.lastSynchronizedDate != "Synchronize to get data!"){
+
+            val lastSynchronizedUserDay = LocalDateTime.parse(user.lastSynchronizedDate,
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).dayOfYear
+            val currentDay = LocalDateTime.now().dayOfYear
+            if(lastSynchronizedUserDay == currentDay){
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun showWarningDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.confirmation_title)
+            .setMessage(R.string.confirmation_message)
+            .setPositiveButton(R.string.confirmation_yes) { _, _ ->
+                val executor = Executors.newSingleThreadExecutor()
+                executor.execute {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        parseXmlCollectionFile()
+                    }
+                }
+            }
+            .setNegativeButton(R.string.confirmation_no, null)
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun parseXmlCollectionFile() {
-        dataFileGames = "$filesDir/gamesData.xml"
-        dataFileExtensions = "$filesDir/extensionsData.xml"
-
-        val requestDataGame = request.readRequest("https://boardgamegeek.com/xmlapi2/collection?username=${user.username}&stats=1&subtype=boardgame")
-        val requestDataExtensions = request.readRequest("https://boardgamegeek.com/xmlapi2/collection?username=${user.username}&stats=1&subtype=boardgameexpansion")
-
-        request.saveData(dataFileGames, requestDataGame)
-        request.saveData(dataFileExtensions, requestDataExtensions)
+        saveRequestDataToFile()
 
         val pullParserFactory: XmlPullParserFactory
-        val databaseAccess = DatabaseHelper(this)
+
         try{
             pullParserFactory = XmlPullParserFactory.newInstance()
             val parser = pullParserFactory.newPullParser()
@@ -141,12 +150,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveRequestDataToFile() {
+        val gameUrlRequest = "https://boardgamegeek.com/xmlapi2/collection?username=${user.username}&stats=1&subtype=boardgame"
+        val extensionsUrlRequest = "https://boardgamegeek.com/xmlapi2/collection?username=${user.username}&stats=1&subtype=boardgameexpansion"
+
+        val requestDataGame = request.readDataFromRequest(gameUrlRequest)
+        val requestDataExtensions = request.readDataFromRequest(extensionsUrlRequest)
+
+        request.saveDataToFile(dataFileGames, requestDataGame)
+        request.saveDataToFile(dataFileExtensions, requestDataExtensions)
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     @Throws (XmlPullParserException::class, IOException::class)
     private fun parseXml(parser: XmlPullParser, extensionXml: Boolean){
         var eventType = parser.eventType
         var game: GameInfo? = null
-
 
         while (eventType != XmlPullParser.END_DOCUMENT){
             var name: String
@@ -181,22 +200,23 @@ class MainActivity : AppCompatActivity() {
 
 
                         } else -> {
-                        if (game != null) {
-                            when (name) {
-                                "name" -> game.gameName = parser.nextText()
-                                "yearpublished" -> game.yearPublished = parser.nextText()
-                                "thumbnail" -> game.image = parser.nextText()
-                                "rank" -> {
-                                    if (parser.getAttributeValue(null, "name") == "boardgame") {
-                                        game.currentRank =
-                                            parser.getAttributeValue(null, "value")
+                            if (game != null) {
+                                when (name) {
+                                    "name" -> game.gameName = parser.nextText()
+                                    "yearpublished" -> game.yearPublished = parser.nextText()
+                                    "thumbnail" -> game.image = parser.nextText()
+                                    "rank" -> {
+                                        if (parser.getAttributeValue(null, "name") == "boardgame") {
+                                            game.currentRank =
+                                                parser.getAttributeValue(null, "value")
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    }
                 }
+
                 XmlPullParser.END_TAG -> {
                     name = parser.name
                     if (name.equals("item", ignoreCase = true) && game != null){
@@ -219,8 +239,9 @@ class MainActivity : AppCompatActivity() {
         val currentDate = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val formatted = currentDate.format(formatter)
-        user.amountOfGame = databaseAccess.getAmountOfGames()
-        user.amountOfExtensions = databaseAccess.getAmountOfExtensions()
+        val (amountOfGames, amountOfExtensions) = databaseAccess.getAmountOfGames()
+        user.amountOfGame = amountOfGames
+        user.amountOfExtensions = amountOfExtensions
         user.lastSynchronizedDate = formatted
         saveUserData(user)
     }
