@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.widget.ProgressBar
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.android.synthetic.main.activity_main.*
@@ -125,15 +126,15 @@ class MainActivity : AppCompatActivity() {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
 
             parser.setInput(inputStreamGames, null)
-            val listOfGames = parseXml(parser)
+            val listOfGames = parseXml(parser, false)
 
             parser.setInput(inputStreamExtensions, null)
-            val listOfExtensions = parseXml(parser)
+            val listOfExtensions = parseXml(parser, true)
 
-            listOfGames!!.stream().forEach { databaseAccess.addGameToDatabase(it)}
-            listOfExtensions!!.stream().forEach { it.extension = true; databaseAccess.addGameToDatabase(it) }
+       //     listOfGames!!.stream().forEach { databaseAccess.addGameToDatabase(it)}
+       //     listOfExtensions!!.stream().forEach { it.extension = true; databaseAccess.addGameToDatabase(it) }
 
-            reloadRefreshDate(listOfGames.size, listOfExtensions.size)
+            reloadRefreshDate(listOfGames!!.size, listOfExtensions!!.size)
 
         } catch (e: XmlPullParserException){
             println(e.printStackTrace())
@@ -144,10 +145,11 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Throws (XmlPullParserException::class, IOException::class)
-    private fun parseXml(parser: XmlPullParser): ArrayList<GameInfo>? {
+    private fun parseXml(parser: XmlPullParser, extensionXml: Boolean): ArrayList<GameInfo>? {
         var games: ArrayList<GameInfo>? = null
         var eventType = parser.eventType
         var game: GameInfo? = null
+
 
         while (eventType != XmlPullParser.END_DOCUMENT){
             var name: String
@@ -156,9 +158,31 @@ class MainActivity : AppCompatActivity() {
                 XmlPullParser.START_TAG -> {
                     name = parser.name
                     when (name) {
+                        "items" ->
+                        {
+                            val amountOfObjects = parser.getAttributeValue(null, "totalitems").toInt()
+                            runOnUiThread {
+
+                                when (extensionXml){
+                                    true -> progressBarTitle.text = this.resources.getString(R.string.progressBarTitleExtension)
+                                    false -> progressBarTitle.text = this.resources.getString(R.string.progressBarTitleGames)
+                                }
+
+                                synchronizeProgressBar.progress = 0
+                                synchronizeProgressBar.max = amountOfObjects
+                                progressBarTitle.visibility = ProgressBar.VISIBLE
+                                synchronizeProgressBar.visibility = ProgressBar.VISIBLE
+                            }
+                        }
+
                         "item" -> {
                             game = GameInfo()
                             game.id = parser.getAttributeValue(null, "objectid")
+                            game.extension = extensionXml
+                            runOnUiThread {
+                                synchronizeProgressBar.incrementProgressBy(1)
+                            }
+
 
                         } else -> {
                         if (game != null) {
@@ -187,6 +211,12 @@ class MainActivity : AppCompatActivity() {
             }
             eventType = parser.next()
         }
+
+        runOnUiThread {
+            synchronizeProgressBar.visibility = ProgressBar.INVISIBLE
+            progressBarTitle.visibility = ProgressBar.INVISIBLE
+        }
+
         return games
     }
 

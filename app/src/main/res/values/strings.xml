@@ -30,6 +30,8 @@
     <string name="textview">TextView</string>
     <string name="progressBarTitleExtension">Downloading data about extensions</string>
     <string name="progressBarTitleGames">Downloading data about games</string>
+    <string name="savingGamesInDatabase">Saving data in database</string>
+    <string name="savingExtensionsInDatabase">Saving extensions in database</string>
 
 
 </resources>
