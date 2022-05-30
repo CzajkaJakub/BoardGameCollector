@@ -30,7 +30,8 @@
     <string name="textview">TextView</string>
     <string name="progressBarTitleGames">Saving data of games</string>
     <string name="progressBarTitleExtension">Saving data of extensions</string>
-
+    <string name="input_field">Type username</string>
+    <string name="save_username">Save username</string>
 
 
 </resources>
