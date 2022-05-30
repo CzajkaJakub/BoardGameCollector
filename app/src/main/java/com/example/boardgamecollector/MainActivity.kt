@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dataFileGames : String
     private lateinit var dataFileExtensions : String
     private val request = Request()
+    private lateinit var databaseAccess : DatabaseHelper
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun addListeners() {
-
+        databaseAccess = DatabaseHelper(this)
         synchronizedDataButton.setOnClickListener {
             if (user.lastSynchronizedDate != "Synchronize to get data!" &&
                 LocalDateTime.parse(
@@ -126,15 +127,12 @@ class MainActivity : AppCompatActivity() {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
 
             parser.setInput(inputStreamGames, null)
-            val listOfGames = parseXml(parser, false)
+            parseXml(parser, false)
 
             parser.setInput(inputStreamExtensions, null)
-            val listOfExtensions = parseXml(parser, true)
+            parseXml(parser, true)
 
-       //     listOfGames!!.stream().forEach { databaseAccess.addGameToDatabase(it)}
-       //     listOfExtensions!!.stream().forEach { it.extension = true; databaseAccess.addGameToDatabase(it) }
-
-            reloadRefreshDate(listOfGames!!.size, listOfExtensions!!.size)
+            reloadRefreshDate()
 
         } catch (e: XmlPullParserException){
             println(e.printStackTrace())
@@ -145,8 +143,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Throws (XmlPullParserException::class, IOException::class)
-    private fun parseXml(parser: XmlPullParser, extensionXml: Boolean): ArrayList<GameInfo>? {
-        var games: ArrayList<GameInfo>? = null
+    private fun parseXml(parser: XmlPullParser, extensionXml: Boolean){
         var eventType = parser.eventType
         var game: GameInfo? = null
 
@@ -154,7 +151,6 @@ class MainActivity : AppCompatActivity() {
         while (eventType != XmlPullParser.END_DOCUMENT){
             var name: String
             when (eventType){
-                XmlPullParser.START_DOCUMENT -> games = ArrayList()
                 XmlPullParser.START_TAG -> {
                     name = parser.name
                     when (name) {
@@ -201,11 +197,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     }
                 }
-
                 XmlPullParser.END_TAG -> {
                     name = parser.name
                     if (name.equals("item", ignoreCase = true) && game != null){
-                        games!!.add(game)
+                        databaseAccess.addGameToDatabase(game)
                     }
                 }
             }
@@ -217,16 +212,15 @@ class MainActivity : AppCompatActivity() {
             progressBarTitle.visibility = ProgressBar.INVISIBLE
         }
 
-        return games
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun reloadRefreshDate(amountOfGames: Int, amountOfExtensions: Int) {
+    private fun reloadRefreshDate() {
         val currentDate = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val formatted = currentDate.format(formatter)
-        user.amountOfGame = amountOfGames - amountOfExtensions
-        user.amountOfExtensions = amountOfExtensions
+        user.amountOfGame = databaseAccess.getAmountOfGames()
+        user.amountOfExtensions = databaseAccess.getAmountOfExtensions()
         user.lastSynchronizedDate = formatted
         saveUserData(user)
     }

@@ -83,6 +83,24 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
         return data
     }
 
+    fun getAmountOfGames(): Int {
+        val database : SQLiteDatabase = this.readableDatabase
+        val cursorData = database.rawQuery("select count(*) from Board_Games group by Extension having Extension = 0;", null)
+        cursorData.moveToFirst()
+        val amount = cursorData.getInt(0)
+        cursorData.close()
+        return amount
+    }
+
+    fun getAmountOfExtensions(): Int {
+        val database : SQLiteDatabase = this.readableDatabase
+        val cursorData = database.rawQuery("select count(*) from Board_Games group by Extension having Extension = 1;", null)
+        cursorData.moveToFirst()
+        val amount = cursorData.getInt(0)
+        cursorData.close()
+        return amount
+    }
+
     companion object {
         const val DATABASE_NAME = "Board_Games_Database.db"
         const val DATABASE_VERSION = 1
