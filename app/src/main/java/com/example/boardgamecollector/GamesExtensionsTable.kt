@@ -127,7 +127,9 @@ class GamesExtensionsTable : AppCompatActivity() {
         var rowNum = 0
         gameData.stream().forEach {
             rowNum++
+            val gameInfo = it
             val valueTableRow = TableRow(this)
+            valueTableRow.setOnClickListener { createHistoryTable(gameInfo) }
             val valueHeaders =
                 listOf(rowNum, it.gameName, it.yearPublished, it.currentRank, it.extension)
             val valueTextViews = listOf(
@@ -156,6 +158,11 @@ class GamesExtensionsTable : AppCompatActivity() {
             }
             tryLoadImages(valueTableRow, it)
         }
+    }
+
+    private fun createHistoryTable(game: GameInfo) {
+        val dataHistory = database.getGameHistory(game.id)
+        dataHistory.forEach { println(it)}
     }
 
     private fun tryLoadImages(valueTableRow: TableRow, gameInfo: GameInfo) {
