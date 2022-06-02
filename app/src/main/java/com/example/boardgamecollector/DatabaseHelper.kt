@@ -54,7 +54,7 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
             database.update(TABLE_NAME_GAMES, contentValuesGame, "_id=?", arrayOf(game.id))
         }
 
-        if (game.extension){
+        if (!game.extension){
             val contentValuesHistory = getContentValueGamesHistory(game)
             database.insert(TABLE_GAMES_HISTORY, null, contentValuesHistory)
         }
@@ -86,9 +86,9 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
         val database : SQLiteDatabase = this.readableDatabase
 
         val query : String = when (getGamesByNameAsc){
-            QueriesTypes.GET_GAMES_BY_NAME_ASC -> "select * from Board_Games where Extension = 0;"
-            QueriesTypes.GET_EXTENSIONS_BY_NAME_ASC -> "select * from Board_Games where Extension = 1;"
-            QueriesTypes.GET_ALL_BY_NAME_ASC -> "select * from Board_Games"
+            QueriesTypes.GET_GAMES_BY_NAME_ASC -> "select * from $TABLE_NAME_GAMES where $EXTENSION = 0;"
+            QueriesTypes.GET_EXTENSIONS_BY_NAME_ASC -> "select * from $TABLE_NAME_GAMES where $EXTENSION = 1;"
+            QueriesTypes.GET_ALL_BY_NAME_ASC -> "select * from $TABLE_NAME_GAMES"
         }
 
         val cursorData = database.rawQuery(query, null)
@@ -137,13 +137,19 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
 
     fun getAmountOfGames(): Pair<Int, Int> {
         val database : SQLiteDatabase = this.readableDatabase
-        val cursorData = database.rawQuery("select count(*) from Board_Games group by Extension;", null)
+        val cursorData = database.rawQuery("select count(*) from $TABLE_NAME_GAMES group by $EXTENSION;", null)
         cursorData.moveToFirst()
-        val amountOfGames = cursorData.getInt(0)
-        cursorData.moveToNext()
-        val amountOfExtensions = cursorData.getInt(0)
-        cursorData.close()
-        return Pair(amountOfGames, amountOfExtensions)
+
+        return try{
+            val amountOfGames = cursorData.getInt(0)
+            cursorData.moveToNext()
+            val amountOfExtensions = cursorData.getInt(0)
+            cursorData.close()
+            Pair(amountOfGames, amountOfExtensions)
+        } catch (e: Exception) {
+            Pair(0, 0)
+        }
+
     }
 
     companion object {
@@ -156,7 +162,6 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
         const val CURRENT_RANK_POSITION = "Current_rank_position"
         const val IMAGE = "Img"
         const val EXTENSION = "Extension"
-
         const val TABLE_GAMES_HISTORY = "History_ranks"
         const val RANK_COLUMN = "Rank"
         const val DATE_RANK = "Date"

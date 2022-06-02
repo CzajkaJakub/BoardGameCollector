@@ -10,7 +10,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/board_game_icon"
-        android:label="board_game_collector"
+        android:label="Board Game Collector"
         android:roundIcon="@mipmap/board_game_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BoardGameCollector"
