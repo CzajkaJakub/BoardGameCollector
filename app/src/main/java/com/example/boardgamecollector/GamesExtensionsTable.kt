@@ -123,6 +123,8 @@ class GamesExtensionsTable : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.N)
     private fun fillTableWithData() {
         //data
+        dataTable.removeViews(1, dataTable.childCount - 1)
+
         var rowNum = 0
         gameData.stream().forEach {
             rowNum++
