@@ -79,19 +79,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         clearDataButton.setOnClickListener{
-            val filesToClear = listOf("/user.json", "/gamesData.xml", "/extensionsData.xml")
-            filesToClear.stream().forEach { File(this.filesDir.toString().plus(it)).delete() }
-            databaseAccess.truncateDatabase()
-            val intent = Intent(this, Settings::class.java)
-            startActivity(intent)
+            AlertDialog.Builder(this)
+                .setTitle(R.string.clear_data)
+                .setMessage(R.string.confirm_clear_data_message)
+                .setPositiveButton(R.string.confirmation_yes) { _, _ ->
+                    val filesToClear = listOf("/user.json", "/gamesData.xml", "/extensionsData.xml")
+                    filesToClear.stream().forEach { File(this.filesDir.toString().plus(it)).delete() }
+                    databaseAccess.truncateDatabase()
+                    val intent = Intent(this, Settings::class.java)
+                    startActivity(intent)
+                }
+                .setNegativeButton(R.string.confirmation_no, null)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show()
         }
-
 
         showDataTable.setOnClickListener{
             val intent = Intent(this, GamesExtensionsTable::class.java)
             startActivity(intent)
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun checkLastSynchronizedDate(): Boolean {
@@ -123,6 +131,8 @@ class MainActivity : AppCompatActivity() {
             .setIcon(android.R.drawable.ic_dialog_info)
             .show()
     }
+
+
 
     @SuppressLint("RestrictedApi")
     @RequiresApi(Build.VERSION_CODES.O)

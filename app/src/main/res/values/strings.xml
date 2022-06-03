@@ -32,6 +32,8 @@
     <string name="progressBarTitleExtension">Saving data of extensions</string>
     <string name="input_field">Type username</string>
     <string name="save_username">Save username</string>
+    <string name="clear_data">Clear data!</string>
+    <string name="confirm_clear_data_message">Do you really want  to delete all the data?</string>
 
 
 </resources>
